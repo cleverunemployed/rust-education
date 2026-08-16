@@ -1,35 +1,47 @@
-use rand::{prelude::*, rng};
-use std::cmp::Ordering;
-use std::io;
-
 fn main() {
-    println!("Guess the number.");
+    let x = 9;
+    let x = x + 3;
 
-    let secret_number = rng().random_range(0..=100);
+    {
+        let x = x - 10;
+        println!("x = {x}");
+    }
 
-    // println!("Secret number: {secret_number}");
+    println!("x = {x}");
 
-    loop {
-        println!("Please input your guess.");
+    let tup: (&str, u8, bool) = ("dfdfd", 90, true);
+    let arr: [i32; 5] = [1, 2, 3, 4, 5];
+    let victory: Vec<u8> = vec![];
+    let victory: Vec<u8> = Vec::new();
 
-        let mut guess = String::new();
+    println!("x = {}", add_five(x));
 
-        io::stdin().read_line(&mut guess).expect("Иди нахуй");
+    if true {
+        println!("x = {}", add_five(7));
+    } else {
+        println!("x = {}", add_five(8));
+    }
 
-        println!("Your guess is {}", guess);
-
-        let guess: i32 = match guess.trim().parse() {
-            Ok(num) => num,
-            Err(_) => continue,
-        };
-
-        match guess.cmp(&secret_number) {
-            Ordering::Less => println!("Too Small!"),
-            Ordering::Equal => {
-                println!("You WIN!");
-                break;
+    'counter: loop {
+        loop {
+            if true {
+                break 'counter;
             }
-            Ordering::Greater => println!("Too Big!"),
         }
     }
+
+    for a in (1..11).rev() {
+        print!("{a}->")
+    }
 }
+
+fn add_five(x: i32) -> i32 {
+    x + 5
+}
+
+// mut -> даёт возможность изменять переменную
+// shading -> даёт возможность переписывать тип и значение переменной
+
+// кортеж -> неизменяемый набор данных различных типов определённой длины
+// массив -> неизменяемый набор данных одного типа определённой длины
+// вектор -> изменяемый набор данных одного типа
