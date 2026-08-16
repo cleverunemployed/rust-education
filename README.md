@@ -1,4 +1,4 @@
-[[https://doc.rust-lang.ru/book/]]
+[Docs](https://doc.rust-lang.ru/book/)
 
 # Чек-лист: Язык программирования Rust
 
