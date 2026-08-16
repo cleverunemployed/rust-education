@@ -1,47 +1,50 @@
-fn main() {
-    let x = 9;
-    let x = x + 3;
+// Вот небольшая проблема программирования: напишите функцию, которая принимает строку слов,
+// разделённых пробелами, и возвращает первое слово, которое она находит в этой строке.
+// Если функция не находит пробела в строке, вся строка должна состоять из одного слова,
+// поэтому должна быть возвращена вся строка.
 
-    {
-        let x = x - 10;
-        println!("x = {x}");
-    }
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
 
-    println!("x = {x}");
-
-    let tup: (&str, u8, bool) = ("dfdfd", 90, true);
-    let arr: [i32; 5] = [1, 2, 3, 4, 5];
-    let victory: Vec<u8> = vec![];
-    let victory: Vec<u8> = Vec::new();
-
-    println!("x = {}", add_five(x));
-
-    if true {
-        println!("x = {}", add_five(7));
-    } else {
-        println!("x = {}", add_five(8));
-    }
-
-    'counter: loop {
-        loop {
-            if true {
-                break 'counter;
-            }
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
         }
     }
 
-    for a in (1..11).rev() {
-        print!("{a}->")
+    &s[..]
+}
+
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
+
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
     }
+
+    &s[..]
 }
 
-fn add_five(x: i32) -> i32 {
-    x + 5
+fn main() {
+    let mut s = String::from("hello world");
+
+    let word = first_word(&s);
+
+    s.clear(); // error!
+
+    println!("the first word is: {word}");
 }
 
-// mut -> даёт возможность изменять переменную
-// shading -> даёт возможность переписывать тип и значение переменной
 
-// кортеж -> неизменяемый набор данных различных типов определённой длины
-// массив -> неизменяемый набор данных одного типа определённой длины
-// вектор -> изменяемый набор данных одного типа
+
+
+// String - нереализует Copy и тем самым передаёт своим владением
+// i, u, f, bool - реализуют Copy
+
+// &s - неизменяемая ссылка сколько угодно
+// &mut s - изменяемая ссылка только одна
+
+// &str - это строковый срез
+// &[start..end] - это срез, ссылка на элементы
