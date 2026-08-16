@@ -1,50 +1,75 @@
-// Вот небольшая проблема программирования: напишите функцию, которая принимает строку слов,
-// разделённых пробелами, и возвращает первое слово, которое она находит в этой строке.
-// Если функция не находит пробела в строке, вся строка должна состоять из одного слова,
-// поэтому должна быть возвращена вся строка.
+// struct Unknown;
+// struct Color(i32, i32, i32);
 
-fn first_word(s: &String) -> &str {
-    let bytes = s.as_bytes();
+// struct Santimetr(u16);
 
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &s[0..i];
-        }
-    }
+// struct User {
+//     name: String,
+//     age: u8,
+//     height: Santimetr
+// }
 
-    &s[..]
+// fn main() {
+//     let scale = 2;
+//     let rect1 = Rectangle {
+//         width: dbg!(30 * scale),
+//         height: 50,
+//     };
+
+//     let _: &Rectangle = dbg!(&rect1);
+// }
+
+
+// dbg! - это имба для вывода, попробуй!
+
+
+
+
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
 }
 
-fn first_word(s: &String) -> &str {
-    let bytes = s.as_bytes();
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
 
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &s[0..i];
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+
+impl Rectangle {
+    fn square(size: u32) -> Self {
+        Self {
+            width: size,
+            height: size,
         }
     }
-
-    &s[..]
 }
+
 
 fn main() {
-    let mut s = String::from("hello world");
+    let sq = Rectangle::square(3);
 
-    let word = first_word(&s);
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+    let rect2 = Rectangle {
+        width: 10,
+        height: 40,
+    };
+    let rect3 = Rectangle {
+        width: 60,
+        height: 45,
+    };
 
-    s.clear(); // error!
-
-    println!("the first word is: {word}");
+    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
+    println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
 }
 
-
-
-
-// String - нереализует Copy и тем самым передаёт своим владением
-// i, u, f, bool - реализуют Copy
-
-// &s - неизменяемая ссылка сколько угодно
-// &mut s - изменяемая ссылка только одна
-
-// &str - это строковый срез
-// &[start..end] - это срез, ссылка на элементы
