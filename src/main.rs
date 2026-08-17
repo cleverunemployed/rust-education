@@ -1,75 +1,83 @@
-// struct Unknown;
-// struct Color(i32, i32, i32);
+// enum IpAddr {
+//     V4(String),
+//     V6(String),
+// }
 
-// struct Santimetr(u16);
 
-// struct User {
-//     name: String,
-//     age: u8,
-//     height: Santimetr
+// enum Message {
+//     Quit,
+//     Move { x: i32, y: i32 },
+//     Write(String),
+//     ChangeColor(i32, i32, i32),
+// }
+
+// impl Message {
+//     fn call(&self) {
+//         // method body would be defined here
+//     }
+// }
+
+
+// enum Option<T> {
+//     None,
+//     Some(T),
 // }
 
 // fn main() {
-//     let scale = 2;
-//     let rect1 = Rectangle {
-//         width: dbg!(30 * scale),
-//         height: 50,
-//     };
 
-//     let _: &Rectangle = dbg!(&rect1);
+//     let m = Message::Write(String::from("hello"));
+//     m.call();
+
+//     let home = IpAddr::V4(String::from("127.0.0.1"));
+
+//     let loopback = IpAddr::V6(String::from("::1"));
 // }
 
 
-// dbg! - это имба для вывода, попробуй!
-
-
-
-
 #[derive(Debug)]
-struct Rectangle {
-    width: u32,
-    height: u32,
+enum UsState {
+    Alabama,
+    Alaska,
+    // --snip--
 }
 
-impl Rectangle {
-    fn area(&self) -> u32 {
-        self.width * self.height
-    }
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
 }
 
-impl Rectangle {
-    fn can_hold(&self, other: &Rectangle) -> bool {
-        self.width > other.width && self.height > other.height
-    }
-}
-
-impl Rectangle {
-    fn square(size: u32) -> Self {
-        Self {
-            width: size,
-            height: size,
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("State quarter from {state:?}!");
+            25
         }
     }
 }
 
-
 fn main() {
-    let sq = Rectangle::square(3);
+    fn plus_one(x: Option<i32>) -> Option<i32> {
+        match x {
+            None => None,
+            Some(i) => Some(i + 1),
+        }
+    }
 
-    let rect1 = Rectangle {
-        width: 30,
-        height: 50,
-    };
-    let rect2 = Rectangle {
-        width: 10,
-        height: 40,
-    };
-    let rect3 = Rectangle {
-        width: 60,
-        height: 45,
-    };
+    let five = Some(5);
+    let six = plus_one(five);
+    let none = plus_one(None);
 
-    println!("Can rect1 hold rect2? {}", rect1.can_hold(&rect2));
-    println!("Can rect1 hold rect3? {}", rect1.can_hold(&rect3));
+    let coin = Coin::Penny;
+    let mut count = 0;
+    if let Coin::Quarter(state) = coin {
+        println!("State quarter from {state:?}!");
+    } else {
+        count += 1;
+    }
 }
 
