@@ -1,150 +1,144 @@
-// Изменения профилей 
+поле для хранения значения i32 в куче:
 
-// $ cargo build
-//     Finished dev [unoptimized + debuginfo] target(s) in 0.0s
-// $ cargo build --release
-//     Finished release [optimized] target(s) in 0.0s
+fn main() {
+    let b = Box::new(5);
+    println!("b = {b}");
+}
 
-// [profile.dev]
-// opt-level = 0
+Поскольку Box<T> является указателем, Rust всегда знает, сколько места нужно Box<T>: размер указателя не 
+меняется в зависимости от объёма данных, на которые он указывает. Это означает, что мы можем поместить Box<T> 
+внутрь экземпляра Cons вместо значения List напрямую. Box<T> будет указывать на значение очередного List, 
+который будет находиться в куче, а не внутри экземпляра Cons. Концептуально у нас все ещё есть список, 
+созданный из списков, содержащих другие списки, но эта реализация теперь больше похожа на размещение элементов 
+рядом друг с другом, а не внутри друг друга.
+enum List {
+    Cons(i32, Box<List>),
+    Nil,
+}
 
-// [profile.release]
-// opt-level = 3
+use crate::List::{Cons, Nil};
 
-// Документация через комментарии, поддерживает markdown
-/// Adds one to the number given.
-///
-/// # Examples
-///
-/// ```
-/// let arg = 5;
-/// let answer = my_crate::add_one(arg);
-///
-/// assert_eq!(6, answer);
-/// ```
-// pub fn add_one(x: i32) -> i32 {
-//     x + 1
-// }
-
-// запуск cargo doc --open
-
-// # Examples в листинге 14-1 для создания раздела в HTML с заголовком "Examples". Вот некоторые другие разделы, которые авторы библиотек обычно используют в своей документации:
-
-// Panics: Сценарии, в которых документированная функция может вызывать панику. Вызывающие функцию, которые 
-// не хотят, чтобы их программы паниковали, должны убедиться, что они не вызывают функцию в этих ситуациях.
-
-// Ошибки: Если функция возвращает Result, описание типов ошибок, которые могут произойти и какие условия 
-// могут привести к тому, что эти ошибки могут быть возвращены, может быть полезным для вызывающих, так что они 
-// могут написать код для обработки различных типов ошибок разными способами.
-
-// Безопасность: Если функция является unsafe для вызова (мы обсуждаем безопасность в главе 19), должен быть
-// раздел, объясняющий, почему функция небезопасна и охватывающий инварианты, которые функция ожидает от 
-// вызывающих сторон.
-
-// запуск cargo test запустит примеры кода в вашей документации как тесты! Нет ничего лучше, 
-// чем документация с примерами.
-
-// Стиль комментариев к документам //! добавляет документацию к элементу, содержащему комментарии, 
-// а не к элементам, следующим за комментариями. Обычно мы используем эти комментарии внутри корневого
-// файла крейта (по соглашению src/lib.rs ) или внутри модуля для документирования крейта или модуля в целом.
-// Например, чтобы добавить документацию, описывающую назначение my_crate , содержащего функцию add_one , 
-// мы добавляем комментарии к документации, начинающиеся с //! в начало файла src/lib.rs , как показано в 
-// листинге 14-2:
-
-// Файл: src/lib.rs
+fn main() {
+    let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));
+}
 
 
-//! # My Crate
-//!
-//! `my_crate` is a collection of utilities to make performing certain
-//! calculations more convenient.
+use std::ops::Deref;
 
-// Прежде чем вы сможете опубликовать любые библиотеки, вам необходимо создать учётную запись на crates.io 
-// и получить API токен. Для этого зайдите на домашнюю страницу crates.io и войдите в систему через учётную 
-// запись GitHub. (В настоящее время требуется наличие учётной записи GitHub, но сайт может поддерживать другие 
-// способы создания учётной записи в будущем.) Сразу после входа в систему перейдите в настройки своей 
-// учётной записи по адресу https://crates.io/me/ и получите свой ключ API. Затем выполните команду 
-// cargo login с вашим ключом API, например:
+impl<T> Deref for MyBox<T> {
+    type Target = T;
 
-// $ cargo login abcdefghijklmnopqrstuvwxyz012345
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
-// Файл: Cargo.toml
+struct MyBox<T>(T);
 
-// [package]
-// name = "guessing_game"
-// Даже если вы выбрали уникальное имя, когда вы запустите cargo publish чтобы опубликовать крейт, 
-// вы получите предупреждение, а затем ошибку:
+impl<T> MyBox<T> {
+    fn new(x: T) -> MyBox<T> {
+        MyBox(x)
+    }
+}
 
-// $ cargo publish
+fn main() {
+    let x = 5;
+    let y = MyBox::new(x);
 
-// [package]
-// name = "guessing_game"
-// version = "0.1.0"
-// edition = "2021"
-// description = "A fun game where you guess what number the computer has chosen."
-// license = "MIT OR Apache-2.0"
-
-// [dependencies]
-
-// Чтобы вычеркнуть версию крейта, в директории крейта, который вы опубликовали ранее, 
-// выполните команду cargo yank и укажите, какую версию вы хотите вычеркнуть. Например, если мы 
-// опубликовали крейт под названием guessing_game версии 1.0.1 и хотим вычеркнуть её, в каталоге 
-// проекта для guessing_game мы выполним:
-
-// $ cargo yank --vers 1.0.1
-// $ cargo yank --vers 1.0.1 --undo
+    assert_eq!(5, x);
+    assert_eq!(5, *y);
+}
 
 
-// Файл: Cargo.toml
+Как разыменованное приведение взаимодействует с изменяемостью
+Подобно тому, как вы используете типаж Deref для переопределения оператора * у неизменяемых ссылок, 
+вы можете использовать типаж DerefMut для переопределения оператора * у изменяемых ссылок.
+
+Rust выполняет разыменованное приведение, когда находит типы и реализации типажей в трёх случаях:
+
+Из типа &T в тип &U когда верно T: Deref<Target=U>
+Из типа &mut T в тип &mut U когда верно T: DerefMut<Target=U>
+Из типа &mut T в тип &U когда верно T: Deref<Target=U>
+Первые два случая идентичны друг другу, за исключением того, что второй реализует изменяемость. В первом 
+случае говорится, что если у вас есть &T, а T реализует Deref для некоторого типа U, вы сможете прозрачно 
+получить &U. Во втором случае говорится, что такое же разыменованное приведение происходит и для изменяемых 
+ссылок.
+
+struct CustomSmartPointer {
+    data: String,
+}
+
+impl Drop for CustomSmartPointer {
+    fn drop(&mut self) {
+        println!("Dropping CustomSmartPointer with data `{}`!", self.data);
+    }
+}
+
+fn main() {
+    let c = CustomSmartPointer {
+        data: String::from("my stuff"),
+    };
+    let d = CustomSmartPointer {
+        data: String::from("other stuff"),
+    };
+    println!("CustomSmartPointers created");
+}
 
 
-// [workspace]
-// resolver = "3"
-// members = ["adder", "add_one"]
-// Затем сгенерируйте новый крейт библиотеки с именем add_one:
+fn main() {
+    let c = CustomSmartPointer {
+        data: String::from("some data"),
+    };
+    println!("CustomSmartPointer created");
+    drop(c);
+    println!("CustomSmartPointer dropped before the end of main");
+}
 
 
-// $ cargo new add_one --lib
-//      Created library `add_one` package
-// Ваш каталог add должен теперь иметь следующие каталоги и файлы:
+enum List {
+    Cons(i32, Rc<List>),
+    Nil,
+}
+
+use crate::List::{Cons, Nil};
+use std::rc::Rc;
+
+// --snip--
+
+fn main() {
+    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));
+    println!("count after creating a = {}", Rc::strong_count(&a));
+    let b = Cons(3, Rc::clone(&a));
+    println!("count after creating b = {}", Rc::strong_count(&a));
+    {
+        let c = Cons(4, Rc::clone(&a));
+        println!("count after creating c = {}", Rc::strong_count(&a));
+    }
+    println!("count after c goes out of scope = {}", Rc::strong_count(&a));
+}
 
 
-// ├── Cargo.lock
-// ├── Cargo.toml
-// ├── add_one
-// │   ├── Cargo.toml
-// │   └── src
-// │       └── lib.rs
-// ├── adder
-// │   ├── Cargo.toml
-// │   └── src
-// │       └── main.rs
-// └── target
-// В файле add_one/src/lib.rs добавим функцию add_one:
+#[derive(Debug)]
+enum List {
+    Cons(Rc<RefCell<i32>>, Rc<List>),
+    Nil,
+}
 
-// Файл: add_one/src/lib.rs
+use crate::List::{Cons, Nil};
+use std::cell::RefCell;
+use std::rc::Rc;
 
+fn main() {
+    let value = Rc::new(RefCell::new(5));
 
-// pub fn add_one(x: i32) -> i32 {
-//     x + 1
-// }
-// Файл: adder/Cargo.toml
+    let a = Rc::new(Cons(Rc::clone(&value), Rc::new(Nil)));
 
+    let b = Cons(Rc::new(RefCell::new(3)), Rc::clone(&a));
+    let c = Cons(Rc::new(RefCell::new(4)), Rc::clone(&a));
 
-// [dependencies]
-// add_one = { path = "../add_one" }
+    *value.borrow_mut() += 10;
 
-// Чтобы запустить бинарный крейт из каталога add, нам нужно указать какой пакет из рабочей области мы 
-// хотим использовать с помощью аргумента -p и названия пакета в команде cargo run:
-
-
-// $ cargo run -p adder
-
-// Расширение Cargo пользовательскими командами
-// Cargo спроектирован так, что вы можете расширять его новыми субкомандами без необходимости изменения самого 
-// Cargo. Если исполняемый файл доступен через переменную окружения $PATH и назван по шаблону cargo-something, 
-// то его можно запускать как субкоманду Cargo cargo something. Пользовательские команды подобные этой также 
-// перечисляются в списке доступных через cargo --list. Возможность использовать cargo install для установки 
-// расширений и затем запускать их так же, как встроенные в Cargo инструменты, это очень удобное следствие 
-// продуманного дизайна Cargo!
-
+    println!("a after = {a:?}");
+    println!("b after = {b:?}");
+    println!("c after = {c:?}");
+}
